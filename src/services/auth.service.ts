@@ -1,6 +1,6 @@
 import api from '@/lib/axios'
 import { useMutation } from '@tanstack/react-query'
-import { setToken } from '@/utils/token'
+// import { setToken } from '@/utils/token' // 👈 keep this for future use
 
 interface LoginPayload {
   email: string
@@ -15,17 +15,16 @@ interface RegisterPayload {
 }
 
 /**
- * Hook to login the user
- * Accepts a callback `onSuccess(user)` that you can use in LoginForm to redirect
+ * Hook for user login
+ * Saves user object in localStorage and redirects based on role
  */
 export const useAuthLogin = (onSuccess?: (user: any) => void) =>
   useMutation({
     mutationFn: async (data: LoginPayload) => {
       const res = await api.post('/auth/login', data)
-      const { token, user } = res.data
+      const { user } = res.data
 
-      // Save token and user info
-      setToken(token)
+      // setToken(res.data.token) // 👈 Enable when backend sends a token
       localStorage.setItem('user', JSON.stringify(user))
 
       return res.data
@@ -36,7 +35,7 @@ export const useAuthLogin = (onSuccess?: (user: any) => void) =>
   })
 
 /**
- * Hook to register a new user
+ * Hook for user registration
  */
 export const useAuthRegister = (onSuccess?: () => void) =>
   useMutation({

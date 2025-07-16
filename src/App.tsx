@@ -1,19 +1,26 @@
-// src/App.tsx
+import { Routes, Route, Navigate } from 'react-router-dom'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import Dashboard from './pages/Dashboard'
+import Projects from './pages/Projects'
+import Users from './pages/Users'
+import Tasks from './pages/Tasks' // 👈 added Tasks page
+import ProtectedRoute from './routes/ProtectedRoute'
 
-import { Button } from "@/components/ui/button";
-
-export default function App() {
-  const handleClick = () => {
-    console.log("Button clicked!");
-  };
-
+function App() {
   return (
-    <div className="min-h-screen   flex items-center justify-center bg-[#000] text-foreground">
-      <div className="p-6 rounded-lg shadow-md border  bg-red-500 h-96 w-96">
-        <Button onClick={handleClick}   className="bg-blue-500 text-white p-4 text-xl">
-          Click Me
-        </Button>
-      </div>
-    </div>
-  );
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/projects" element={<Projects />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/tasks" element={<Tasks />} /> {/* 👈 new protected route */}
+      </Route>
+    </Routes>
+  )
 }
+
+export default App

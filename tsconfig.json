@@ -14,12 +14,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",                      // ✅ Enables JSX
-    "baseUrl": ".",
+    "jsx": "react-jsx",
+    "baseUrl": "src",                            // ✅ set base to 'src'
     "paths": {
-      "@/*": ["src/*"]                        // ✅ Enables aliasing
+      "@/*": ["*"]                               // ✅ now '@/utils/token' resolves to 'src/utils/token'
     }
   },
   "include": ["src"]
 }
-

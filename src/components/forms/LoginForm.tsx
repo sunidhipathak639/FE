@@ -23,16 +23,32 @@ export default function LoginForm() {
 
   const navigate = useNavigate()
 
-  const { mutate: login, isLoading } = useAuthLogin(() => {
+  // login hook with role-based redirect
+  const { mutate: login, isLoading } = useAuthLogin((user) => {
     toast.success('Login successful ✅')
-    navigate('/dashboard')
+
+    switch (user.role) {
+      case 'ADMIN':
+        navigate('/dashboard')
+        break
+      case 'PROJECT_MANAGER':
+        navigate('/projects')
+        break
+      case 'DEVELOPER':
+      case 'TESTER':
+        navigate('/tasks')
+        break
+      case 'VIEWER':
+        navigate('/users')
+        break
+      default:
+        navigate('/dashboard')
+    }
   })
 
   const onSubmit = (data: LoginData) => {
     login(data, {
-      onError: () => {
-        toast.error('Invalid email or password ❌')
-      }
+      onError: () => toast.error('Invalid email or password ❌')
     })
   }
 
@@ -43,6 +59,7 @@ export default function LoginForm() {
     >
       <h2 className="text-xl font-semibold text-center">Login</h2>
 
+      {/* Email Field */}
       <div>
         <Label htmlFor="email">Email</Label>
         <Input type="email" {...register('email')} />
@@ -51,6 +68,7 @@ export default function LoginForm() {
         )}
       </div>
 
+      {/* Password Field */}
       <div>
         <Label htmlFor="password">Password</Label>
         <Input type="password" {...register('password')} />
@@ -59,8 +77,9 @@ export default function LoginForm() {
         )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? 'Logging in...' : 'Login'}
+      {/* Submit Button */}
+      <Button type="submit" variant="ghost" className="w-full" disabled={isLoading}>
+        {isLoading ? 'Logging in…' : 'Login'}
       </Button>
     </form>
   )

@@ -8,6 +8,7 @@ import { Label } from '../ui/label'
 import { registerSchema } from '@/lib/utils'
 import { useAuthRegister } from '@/services/auth.service'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 type RegisterData = z.infer<typeof registerSchema>
 
@@ -21,39 +22,61 @@ export default function RegisterForm() {
   })
 
   const navigate = useNavigate()
-  const { mutate: registerUser, isLoading } = useAuthRegister(() => {
+
+  const { mutate: registerUser, isLoading,error } = useAuthRegister(() => {
+    toast.success('Registered successfully 🎉')
     navigate('/login')
   })
 
   const onSubmit = (data: RegisterData) => {
-    registerUser(data)
+    registerUser(data, {
+      onError: () => toast.error(error?.response?.data?.message ||'Registration failed ❌')
+     
+    })
+   
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-sm space-y-4 p-6 bg-white shadow rounded-md">
-      <h2 className="text-xl font-semibold text-center">Register</h2>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="w-full max-w-sm space-y-4 p-6 bg-white shadow rounded-md"
+    >
+      <h2 className="text-xl font-semibold text-center">Create Account</h2>
 
+      {/* Name */}
       <div>
         <Label htmlFor="name">Name</Label>
         <Input type="text" {...register('name')} />
-        {errors.name && <p className="text-red-500 text-sm">{errors.name.message}</p>}
+        {errors.name && (
+          <p className="text-red-500 text-sm">{errors.name.message}</p>
+        )}
       </div>
 
+      {/* Email */}
       <div>
         <Label htmlFor="email">Email</Label>
         <Input type="email" {...register('email')} />
-        {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
+        {errors.email && (
+          <p className="text-red-500 text-sm">{errors.email.message}</p>
+        )}
       </div>
 
+      {/* Password */}
       <div>
         <Label htmlFor="password">Password</Label>
         <Input type="password" {...register('password')} />
-        {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
+        {errors.password && (
+          <p className="text-red-500 text-sm">{errors.password.message}</p>
+        )}
       </div>
 
+      {/* Role */}
       <div>
         <Label htmlFor="role">Role</Label>
-        <select {...register('role')} className="w-full border border-gray-300 rounded px-3 py-2">
+        <select
+          {...register('role')}
+          className="w-full border border-gray-300 rounded px-3 py-2"
+        >
           <option value="">Select Role</option>
           <option value="ADMIN">Admin</option>
           <option value="PROJECT_MANAGER">Project Manager</option>
@@ -61,11 +84,13 @@ export default function RegisterForm() {
           <option value="TESTER">Tester</option>
           <option value="VIEWER">Viewer</option>
         </select>
-        {errors.role && <p className="text-red-500 text-sm">{errors.role.message}</p>}
+        {errors.role && (
+          <p className="text-red-500 text-sm">{errors.role.message}</p>
+        )}
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? 'Registering...' : 'Register'}
+      <Button type="submit" variant='ghost' className="w-full" disabled={isLoading}>
+        {isLoading ? 'Registering…' : 'Register'}
       </Button>
     </form>
   )

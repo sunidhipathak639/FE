@@ -1,9 +1,11 @@
-// src/layouts/DashboardLayout.tsx
-import React from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 import { removeToken } from '@/utils/token'
 
-export default function DashboardLayout() {
+
+interface DashboardLayoutProps {
+  children: React.ReactNode
+}
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -33,9 +35,8 @@ export default function DashboardLayout() {
       </header>
 
       {/* Content */}
-      <main className="flex-1 p-6 bg-gray-100">
-        <Outlet />
-      </main>
+      <main className="flex-1 p-6 bg-gray-100">{children}</main>
+
     </div>
   )
 }

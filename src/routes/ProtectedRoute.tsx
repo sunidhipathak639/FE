@@ -5,7 +5,7 @@ import { getToken } from '@/utils/token'
 const ProtectedRoute = () => {
   const location = useLocation()
   const token = getToken()
-
+console.log(token,"awfawf")
   if (!token) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }

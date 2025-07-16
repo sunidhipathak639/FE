@@ -1,4 +1,5 @@
 import api from '@/lib/axios'
+import { setToken } from '@/utils/token'
 import { useMutation } from '@tanstack/react-query'
 // import { setToken } from '@/utils/token' // 👈 keep this for future use
 
@@ -22,11 +23,13 @@ export const useAuthLogin = (onSuccess?: (user: any) => void) =>
   useMutation({
     mutationFn: async (data: LoginPayload) => {
       const res = await api.post('/auth/login', data)
+
+
       const { user } = res.data
-
-      // setToken(res.data.token) // 👈 Enable when backend sends a token
+      const { token } = res.data
       localStorage.setItem('user', JSON.stringify(user))
-
+      localStorage.setItem('token', JSON.stringify(token))
+      setToken(token)
       return res.data
     },
     onSuccess: (data) => {

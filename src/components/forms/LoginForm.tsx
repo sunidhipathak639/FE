@@ -23,10 +23,10 @@ export default function LoginForm() {
 
   const navigate = useNavigate()
 
-  // login hook with role-based redirect
   const { mutate: login, isLoading } = useAuthLogin((user) => {
     toast.success('Login successful ✅')
 
+    // 🔄 Role-based redirection only (no unconditional navigate)
     switch (user.role) {
       case 'ADMIN':
         navigate('/dashboard')

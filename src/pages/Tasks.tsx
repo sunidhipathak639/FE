@@ -1,42 +1,45 @@
-import { useGetTasks } from '@/services/task.service'
+import { useTasks, useCreateTask } from '@/services/task.service'
 import TaskForm from '@/components/TaskForm'
-import { Card } from "@/components/ui/card" 
+import { Card } from '@/components/ui/card'
 import { Loader2 } from 'lucide-react'
 
 export default function TasksPage() {
-  const { data: tasks, isLoading, isError } = useGetTasks()
+  const { data: tasks, isLoading, isError } = useTasks()
+  const { mutate: createTask, isPending } = useCreateTask()
+
+  const handleSubmit = (formData: { title: string; description?: string }) => {
+    createTask(formData)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <Loader2 className="animate-spin w-6 h-6" />
+      </div>
+    )
+  }
+
+  if (isError) {
+    return <div className="text-red-600 text-center mt-10">Failed to load tasks.</div>
+  }
 
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      <h1 className="text-2xl font-bold">Tasks</h1>
+    <div className="max-w-2xl mx-auto py-10 px-4">
+      <h1 className="text-2xl font-semibold mb-6">Tasks</h1>
 
-      {/* Task Creation Form */}
-      <TaskForm />
+      <TaskForm onSubmit={handleSubmit} isLoading={isPending} />
 
-      {/* Task List */}
-      <div className="space-y-4">
-        {isLoading && (
-          <div className="flex items-center justify-center py-10">
-            <Loader2 className="animate-spin w-6 h-6 text-gray-600" />
-          </div>
+      <div className="mt-8 space-y-4">
+        {tasks?.length === 0 ? (
+          <p className="text-gray-600 text-center">No tasks found.</p>
+        ) : (
+          tasks?.map((task: any) => (
+            <Card key={task.id} className="p-4">
+              <h3 className="text-lg font-medium">{task.title}</h3>
+              {task.description && <p className="text-sm text-gray-700">{task.description}</p>}
+            </Card>
+          ))
         )}
-
-        {isError && (
-          <p className="text-red-500 text-center">Failed to load tasks.</p>
-        )}
-
-        {tasks && tasks.length === 0 && (
-          <p className="text-center text-gray-500">No tasks available.</p>
-        )}
-
-        {tasks?.map((task) => (
-          <Card key={task.id} className="p-4 shadow-sm">
-            <h3 className="font-medium">{task.title}</h3>
-            {task.description && (
-              <p className="text-sm text-gray-600 mt-1">{task.description}</p>
-            )}
-          </Card>
-        ))}
       </div>
     </div>
   )

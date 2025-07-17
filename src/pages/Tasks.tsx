@@ -1,6 +1,6 @@
-import { useTasks, useCreateTask } from '@/services/task.service'
-import TaskForm from '@/components/TaskForm'
-import { Card } from '@/components/ui/card'
+import { useTasks, useCreateTask } from '../services/task.service'
+import TaskForm from '../components/TaskForm'
+import { Card } from '../components/ui/card'
 import { Loader2 } from 'lucide-react'
 
 export default function TasksPage() {

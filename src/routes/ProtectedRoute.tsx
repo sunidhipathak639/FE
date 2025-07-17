@@ -1,6 +1,6 @@
 import React from 'react'
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
-import { getToken } from '@/utils/token'
+import { getToken } from '../utils/token'
 
 const ProtectedRoute = () => {
   const location = useLocation()

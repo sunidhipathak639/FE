@@ -2,10 +2,10 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useCreateTask } from '@/services/task.service'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
+import { useCreateTask } from '../services/task.service'
+import { Input } from '../components/ui/input'
+import { Button } from '../components/ui/button'
+import { Textarea } from '../components/ui/textarea'
 
 const taskSchema = z.object({
   title: z.string().min(1, 'Title is required'),

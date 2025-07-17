@@ -6,7 +6,7 @@ import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
 import { registerSchema } from '@/lib/utils'
-import { useAuthRegister } from '@/services/auth.service'
+import { useAuthRegister } from '../../services/auth.service'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 

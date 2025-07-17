@@ -1,6 +1,5 @@
-import React from 'react'
-import DashboardLayout from '@/layouts/DashboardLayout'
-import { getUserFromToken } from '@/utils/token'
+import DashboardLayout from '../layouts/DashboardLayout'
+import { getUserFromToken } from '../utils/token'
 
 export default function Dashboard() {
   const user = getUserFromToken()

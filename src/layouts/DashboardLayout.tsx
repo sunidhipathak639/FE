@@ -1,5 +1,5 @@
 import { Link, Outlet, useNavigate } from 'react-router-dom'
-import { removeToken } from '@/utils/token'
+import { removeToken } from '../utils/token'
 
 
 interface DashboardLayoutProps {

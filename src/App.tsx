@@ -17,7 +17,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/users" element={<Users />} />
-        <Route path="/tasks" element={<Tasks />} /> {/* 👈 new protected route */}
+        <Route path="/tasks" element={<Tasks />} />
       </Route>
     </Routes>
   )

@@ -7,6 +7,12 @@ import {
   updateProject
 } from '@/services/project.service'
 import {
+  useTasks,
+  useCreateTask,
+  useUpdateTask,
+  useDeleteTask,
+} from '../services/task.service' // Import task services
+import {
   Dialog,
   DialogTrigger,
   DialogContent,
@@ -17,7 +23,6 @@ import {
 import { toast } from 'react-toastify'
 import { Button } from '../components/ui/button'
 import { Input } from '../components/ui/input'
-import { useTasks, useCreateTask } from '../services/task.service' // Import task services
 import { Loader2 } from 'lucide-react'
 
 type Project = {
@@ -46,9 +51,12 @@ export default function Projects() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null)
   const [taskTitle, setTaskTitle] = useState('')
   const [taskDescription, setTaskDescription] = useState('')
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
 
   const { data: tasksData, isLoading: tasksLoading, isError: tasksError } = useTasks() // Get tasks
   const { mutate: createTask, isPending: isTaskPending } = useCreateTask() // Create task
+  const { mutate: updateTask } = useUpdateTask() // Update task
+  const { mutate: deleteTask } = useDeleteTask() // Delete task
 
   const fetchProjects = async () => {
     try {
@@ -119,7 +127,35 @@ export default function Projects() {
     }
   }
 
-  // Handle tasks data correctly
+  const handleTaskEdit = (task: Task) => {
+    setSelectedTask(task)
+    setTaskTitle(task.title)
+    setTaskDescription(task.description)
+  }
+
+  const handleTaskUpdate = () => {
+    if (selectedTask) {
+      updateTask({
+        id: selectedTask.id,
+        data: {
+          title: taskTitle,
+          description: taskDescription,
+          status: selectedTask.status, // Keeping the existing status
+        },
+      })
+      setTaskTitle('')
+      setTaskDescription('')
+      setSelectedTask(null)
+    }
+  }
+
+  const handleTaskDelete = (taskId: string) => {
+    if (confirm('Are you sure you want to delete this task?')) {
+      deleteTask(taskId)
+      setSelectedTask(null)
+    }
+  }
+
   const tasks = tasksData?.data || []
 
   if (tasksLoading) {
@@ -183,6 +219,18 @@ export default function Projects() {
                           <h5 className="font-medium">{task.title}</h5>
                           <p className="text-sm text-gray-700">{task.description}</p>
                           <p className="text-xs text-gray-500">Status: {task.status}</p>
+                          <Button
+                            variant="ghost"
+                            onClick={() => handleTaskEdit(task)}
+                          >
+                            Edit Task
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            onClick={() => handleTaskDelete(task.id)}
+                          >
+                            Delete Task
+                          </Button>
                         </div>
                       ))}
                   </div>
@@ -201,11 +249,37 @@ export default function Projects() {
                         value={taskDescription}
                         onChange={(e) => setTaskDescription(e.target.value)}
                       />
-                      <Button onClick={handleTaskSubmit}  variant='ghost' disabled={isTaskPending}>
+                      <Button
+                        onClick={handleTaskSubmit}
+                        variant="ghost"
+                        disabled={isTaskPending}
+                      >
                         {isTaskPending ? 'Creating Task...' : 'Create Task'}
                       </Button>
                     </div>
                   </div>
+
+                  {/* Task Edit Form */}
+                  {selectedTask && (
+                    <div className="mt-4 space-y-4">
+                      <h5 className="text-lg font-semibold">Edit Task</h5>
+                      <div className="space-y-4">
+                        <Input
+                          placeholder="Task Title"
+                          value={taskTitle}
+                          onChange={(e) => setTaskTitle(e.target.value)}
+                        />
+                        <Input
+                          placeholder="Task Description"
+                          value={taskDescription}
+                          onChange={(e) => setTaskDescription(e.target.value)}
+                        />
+                        <Button onClick={handleTaskUpdate} variant="ghost">
+                          Update Task
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -235,7 +309,7 @@ export default function Projects() {
           </div>
 
           <DialogFooter className="mt-4">
-            <Button type="button" variant='ghost' onClick={handleSubmit}>
+            <Button type="button" variant="ghost" onClick={handleSubmit}>
               {editingProject ? 'Update' : 'Create'}
             </Button>
           </DialogFooter>

@@ -42,7 +42,7 @@ export default function RegisterForm() {
   return (
 <Card
   className={cn(
-    'relative scale-125 w-[450px] h-[560px] border border-transparent p-[2px] rounded-xl shadow-lg aspect-video isolate backdrop-blur-sm overflow-hidden'
+    'relative  w-[450px] h-[560px] border border-transparent p-[2px] rounded-xl shadow-lg aspect-video isolate backdrop-blur-sm overflow-hidden'
   )}
 >
   {/* Fluid animated border background */}
@@ -126,7 +126,7 @@ export default function RegisterForm() {
           {isLoading ? 'Registering…' : 'Register'}
         </Button>
 
-        <p className="text-sm text-muted-foreground text-center">
+        <p className="text-sm text-white text-muted-foreground text-center">
           Already have an account?
           <Button
             type="button"

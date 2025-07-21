@@ -57,7 +57,7 @@ export default function LoginForm() {
   return (
     <Card
   className={cn(
-    'relative scale-125 w-[450px] h-[370px] border border-transparent p-[2px] rounded-xl shadow-lg aspect-video isolate backdrop-blur-sm overflow-hidden'
+    'relative w-[450px] h-[370px] border border-transparent p-[2px] rounded-xl shadow-lg aspect-video isolate backdrop-blur-sm overflow-hidden'
   )}
 >
   {/* Fluid animated border background */}
@@ -110,7 +110,7 @@ export default function LoginForm() {
         {isLoading ? 'Logging in…' : 'Login'}
       </Button>
 
-        <p className="text-sm text-muted-foreground text-center">
+        <p className="text-sm text-muted-foreground text-white text-center">
           Dont have an account?{' '}
           <Button
             type="button"

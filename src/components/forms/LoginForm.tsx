@@ -5,10 +5,12 @@ import { z } from 'zod'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import { Label } from '../ui/label'
-import { loginSchema } from '../../lib/utils'
+import { cn, loginSchema } from '../../lib/utils'
 import { useAuthLogin } from '../../services/auth.service'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { motion } from 'framer-motion'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card'
 
 type LoginData = z.infer<typeof loginSchema>
 
@@ -53,34 +55,76 @@ export default function LoginForm() {
   }
 
   return (
+    <Card
+  className={cn(
+    'relative scale-125 w-[450px] h-[370px] border border-transparent p-[2px] rounded-xl shadow-lg aspect-video isolate backdrop-blur-sm overflow-hidden'
+  )}
+>
+  {/* Fluid animated border background */}
+  <motion.div
+    animate={{
+      backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+    }}
+    transition={{
+      duration: 10,
+      repeat: Infinity,
+      ease: 'linear',
+    }}
+    className="absolute inset-0 rounded-[inherit] z-[-1] bg-[length:300%_300%] bg-gradient-to-r from-pink-500 via-blue-500 to-green-500"
+  />
+
+  {/* Main inner card content */}
+  <div className="rounded-[inherit] bg-black/90 backdrop-blur-3xl w-full h-full flex flex-col gap-6 py-6">
+    <CardHeader className="px-6">
+      <CardTitle className="text-lg md:text-xl text-white">Login Account</CardTitle>
+      <CardDescription className="text-xs md:text-sm text-zinc-300">
+        Fill the form to register
+      </CardDescription>
+    </CardHeader>
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className="w-full max-w-sm space-y-4 p-6 bg-white shadow rounded-md"
     >
-      <h2 className="text-xl font-semibold text-center">Login</h2>
+            <CardContent className="px-6 grid gap-4 space-y-5">
 
       {/* Email Field */}
-      <div>
+        <div className="grid gap-2 relative">
         <Label htmlFor="email">Email</Label>
         <Input type="email" {...register('email')} />
         {errors.email && (
-          <p className="text-red-500 text-sm">{errors.email.message}</p>
+          <p className="text-rose-500 text-sm mt-1 absolute -bottom-6.5 text-left font-extralight">{errors.email.message}</p>
         )}
       </div>
 
       {/* Password Field */}
-      <div>
+        <div className="grid gap-2 relative">
         <Label htmlFor="password">Password</Label>
         <Input type="password" {...register('password')} />
         {errors.password && (
-          <p className="text-red-500 text-sm">{errors.password.message}</p>
+          <p className="text-rose-500 text-sm mt-1 absolute -bottom-6.5 text-left font-extralight">{errors.password.message}</p>
         )}
       </div>
+            </CardContent>
 
-      {/* Submit Button */}
+    <CardFooter className="flex flex-col px-6 gap-3 mt-4">
       <Button type="submit" variant="ghost" className="w-full" disabled={isLoading}>
         {isLoading ? 'Logging in…' : 'Login'}
       </Button>
+
+        <p className="text-sm text-muted-foreground text-center">
+          Dont have an account?{' '}
+          <Button
+            type="button"
+            variant="link"
+            className="p-0 h-auto ml-1 text-white underline cursor-pointer"
+            onClick={() => navigate('/register')}
+          >
+            Sign Up
+          </Button>
+        </p>
+      </CardFooter>
+
     </form>
+      </div>
+</Card>
   )
 }

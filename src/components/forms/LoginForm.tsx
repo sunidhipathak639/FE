@@ -89,7 +89,7 @@ export default function LoginForm() {
       {/* Email Field */}
         <div className="grid gap-2 relative">
         <Label htmlFor="email">Email</Label>
-        <Input type="email" {...register('email')} />
+        <Input type="email" {...register('email')} className='text-white' />
         {errors.email && (
           <p className="text-rose-500 text-sm mt-1 absolute -bottom-6.5 text-left font-extralight">{errors.email.message}</p>
         )}
@@ -98,7 +98,7 @@ export default function LoginForm() {
       {/* Password Field */}
         <div className="grid gap-2 relative">
         <Label htmlFor="password">Password</Label>
-        <Input type="password" {...register('password')} />
+        <Input className='text-white' type="password" {...register('password')} />
         {errors.password && (
           <p className="text-rose-500 text-sm mt-1 absolute -bottom-6.5 text-left font-extralight">{errors.password.message}</p>
         )}
@@ -106,7 +106,7 @@ export default function LoginForm() {
             </CardContent>
 
     <CardFooter className="flex flex-col px-6 gap-3 mt-4">
-      <Button type="submit" variant="ghost" className="w-full" disabled={isLoading}>
+      <Button type="submit" variant="ghost" className="w-full text-white curor" disabled={isLoading}>
         {isLoading ? 'Logging in…' : 'Login'}
       </Button>
 

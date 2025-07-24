@@ -17,9 +17,9 @@ export const getAllComments = async () => {
 
 // Get comments for a specific task
 export const getCommentsByTask = async (taskId: string) => {
-  const response = await api.get(`/comments/${taskId}`)
-  return response.data
-}
+  const response = await api.get(`/comments/task/${taskId}`);
+  return response.data;
+};
 
 // Optional: Delete a comment
 export const deleteComment = async (id: string) => {

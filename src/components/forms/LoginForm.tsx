@@ -11,10 +11,13 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { motion } from 'framer-motion'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card'
+import { useAuth } from '@/context/AuthContext'
 
 type LoginData = z.infer<typeof loginSchema>
 
 export default function LoginForm() {
+    const { setUser, setToken } = useAuth() 
+
   const {
     register,
     handleSubmit,
@@ -27,7 +30,7 @@ export default function LoginForm() {
 
   const { mutate: login, isLoading } = useAuthLogin((user) => {
     toast.success('Login successful ✅')
-
+    setUser(user)
     // 🔄 Role-based redirection only (no unconditional navigate)
     switch (user.role) {
       case 'ADMIN':
@@ -37,11 +40,12 @@ export default function LoginForm() {
         navigate('/projects')
         break
       case 'DEVELOPER':
+        navigate('/projects')
       case 'TESTER':
-        navigate('/tasks')
+        navigate('/projects')
         break
       case 'VIEWER':
-        navigate('/users')
+        navigate('/dashboard')
         break
       default:
         navigate('/dashboard')
@@ -53,6 +57,7 @@ export default function LoginForm() {
       onError: () => toast.error('Invalid email or password ❌')
     })
   }
+
 
   return (
     <Card

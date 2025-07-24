@@ -1,26 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../components/ui/button"; // Assuming the Button component is part of your UI library
 import { useMediaQuery } from "react-responsive"; // Optional, for better control on breakpoints
-import { Menu, X, Sun, Moon } from "lucide-react"; // Lucide icons for the menu and theme toggle
-import { Link } from "react-router-dom"; // Import Link from React Router
+import { Menu, X, Sun, Moon, LogOut, Bug, ClipboardList, Code2, Eye, ShieldCheck } from "lucide-react"; // Lucide icons for the menu and theme toggle
+import { Link, useNavigate } from "react-router-dom"; // Import Link from React Router
+import { removeToken } from "@/utils/token";
+import { useAuth } from "@/context/AuthContext";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true); // Dark mode state
+  const navigate = useNavigate()
 
   const toggleNav = () => setIsNavOpen(!isNavOpen);
   const toggleDarkMode = () => setIsDarkMode(!isDarkMode);
+  const { user } = useAuth();
 
-  // For better mobile responsiveness, you can use media queries for breakpoints
   const isMobile = useMediaQuery({ maxWidth: 768 });
 
+  const handleLogout = () => {
+    removeToken()
+    navigate('/login')
+  }
   return (
     <div className={`flex min-h-screen ${isDarkMode ? "bg-black" : "bg-white"}`}>
       {/* Side Navigation for mobile devices */}
       <div
-        className={`fixed inset-0 z-50 transition-all transform bg-gray-900 bg-opacity-90 sm:hidden ${
-          isNavOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed inset-0 z-50 transition-all transform bg-gray-900 bg-opacity-90 sm:hidden ${isNavOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* Side nav header */}
         <div className="flex justify-between items-center p-4 border-b border-gray-700">
@@ -47,14 +53,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <Menu className="w-4 h-4" /> Projects
             </Button>
           </Link>
-          <Link to="/settings">
-            <Button
-              variant="ghost"
-              className="text-white hover:bg-gray-700 w-full flex items-center gap-2"
-            >
-              <Menu className="w-4 h-4" /> Settings
-            </Button>
-          </Link>
+          {user?.role === 'ADMIN' && (
+            <Link to="/users">
+              <Button
+                variant="ghost"
+                className="text-white hover:bg-gray-700 w-full flex items-center gap-2"
+              >
+                <Menu className="w-4 h-4" /> Users
+              </Button>
+            </Link>
+          )}
+
         </div>
       </div>
 
@@ -78,26 +87,63 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   Projects
                 </Button>
               </Link>
-              <Link to="/settings">
-                <Button variant="ghost" className="text-white hover:bg-gray-700">
-                  Settings
-                </Button>
-              </Link>
+              {user?.role === 'ADMIN' && (
+                <Link to="/users">
+                  <Button variant="ghost" className="text-white hover:bg-gray-700">
+                    Users
+                  </Button>
+                </Link>
+              )}
+
             </nav>
           )}
 
           {/* Theme toggle button */}
-          <Button
-            variant="ghost"
-            onClick={toggleDarkMode}
-            className="text-white hover:bg-gray-700"
-          >
-            {isDarkMode ? (
-              <Sun className="w-6 h-6" />
-            ) : (
-              <Moon className="w-6 h-6" />
+          <div className="flex items-center gap-3">
+            {/* Role, Name & Email */}
+            {user?.role && (
+              <div className="flex items-center gap-2 px-3 py-1 rounded-md bg-gray-800 text-white border border-gray-600">
+                {/* Role Icon */}
+                {user.role === 'ADMIN' && <ShieldCheck className="w-4 h-4 text-green-400" />}
+                {user.role === 'PROJECT_MANAGER' && <ClipboardList className="w-4 h-4 text-blue-400" />}
+                {user.role === 'DEVELOPER' && <Code2 className="w-4 h-4 text-yellow-400" />}
+                {user.role === 'TESTER' && <Bug className="w-4 h-4 text-pink-400" />}
+                {user.role === 'VIEWER' && <Eye className="w-4 h-4 text-gray-400" />}
+
+                {/* Role Text */}
+                <span className="uppercase font-semibold tracking-tight">{user.role}</span>
+
+                {/* Name with Email Tooltip */}
+                <div className="relative group cursor-pointer">
+                  <span className="ml-2 font-medium capitalize">{user.name}</span>
+
+                  {/* Email Tooltip */}
+                  <div className="absolute left-1/2 transform -translate-x-1/2 top-8 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gray-900 text-white text-xs px-3 py-1 rounded shadow-lg border border-gray-700 whitespace-nowrap">
+                    {user.email}
+                  </div>
+                </div>
+              </div>
             )}
-          </Button>
+
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              onClick={toggleDarkMode}
+              className="text-white hover:bg-gray-700"
+            >
+              {isDarkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+            </Button>
+
+            {/* Logout */}
+            <Button
+              variant="ghost"
+              onClick={handleLogout}
+              className="text-white hover:bg-gray-700 flex items-center gap-2"
+            >
+              <LogOut className="w-5 h-5 text-red-500" />
+            </Button>
+          </div>
+
 
           {/* Toggle button for mobile */}
           {isMobile && (

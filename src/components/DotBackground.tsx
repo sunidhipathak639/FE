@@ -38,7 +38,7 @@ export function DotBackground({ children }: { children: React.ReactNode }) {
   return (
     <div
       ref={containerRef}
-      className="relative flex min-h-[100dvh] w-full items-center justify-center bg-white dark:bg-black overflow-hidden"
+      className="relative flex min-h-[100dvh] w-full items-center justify-center bg-black dark:bg-black overflow-hidden"
     >
       {/* Multicolored dot layers */}
       <motion.div
@@ -58,7 +58,7 @@ export function DotBackground({ children }: { children: React.ReactNode }) {
         initial={{ scale: 1 }}
         animate={{ scale: [1, 1.05, 1] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black z-10"
+        className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black z-10"
       />
 
       <div className="relative z-20">{children}</div>

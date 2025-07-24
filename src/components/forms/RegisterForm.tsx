@@ -70,7 +70,7 @@ export default function RegisterForm() {
             {/* Name */}
             <div className="grid gap-2 relative">
               <Label htmlFor="name">Name</Label>
-              <Input className={`border ${errors.name ? 'border-rose-500' : ''}`} id="name" {...register('name')} />
+              <Input className={`border !text-white ${errors.name ? 'border-rose-500' : ''}`} id="name" {...register('name')} />
               {errors.name && (
                 <p className="text-rose-500 text-sm mt-1 absolute -bottom-6.5 text-left font-extralight">{errors.name.message}</p>
               )}
@@ -79,7 +79,7 @@ export default function RegisterForm() {
             {/* Email */}
             <div className="grid gap-2 relative">
               <Label htmlFor="email">Email</Label>
-              <Input className={`border ${errors.email ? 'border-rose-500' : ''}`} id="email" type="email" {...register('email')} />
+              <Input className={`border !text-white ${errors.email ? 'border-rose-500' : ''}`} id="email" type="email" {...register('email')} />
               {errors.email && (
                 <p className="text-rose-500 text-sm mt-1 absolute -bottom-6.5 text-left font-extralight">{errors.email.message}</p>
               )}

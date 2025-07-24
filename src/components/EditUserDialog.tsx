@@ -74,7 +74,7 @@ const onSubmit = async (data: any) => {
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
           <div>
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className='text-black'>Name</Label>
             <Input
               id="name"
               placeholder="Enter full name"
@@ -87,7 +87,7 @@ const onSubmit = async (data: any) => {
           </div>
 
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label className='text-black' htmlFor="email">Email</Label>
             <Input
               id="email"
               placeholder="Enter email"
@@ -101,7 +101,7 @@ const onSubmit = async (data: any) => {
           </div>
 
           <div>
-            <Label htmlFor="role">Role</Label>
+            <Label className='text-black' htmlFor="role">Role</Label>
             <Select
               onValueChange={(value) => setValue('role', value)}
               defaultValue={watch('role')}

@@ -347,8 +347,7 @@ export default function Projects() {
                             <p className="text-sm text-gray-300">
                               {task.description}
                             </p>
-                            {user?.role === "ADMIN" ||
-                            user?.role === "PROJECT_MANAGER" ? (
+               
                               <div className="flex items-center gap-2 mt-2">
                                 <label className="text-sm font-medium text-white">
                                   Status:
@@ -373,8 +372,7 @@ export default function Projects() {
                                   <option value="COMPLETED">COMPLETED</option>
                                 </select>
                               </div>
-                            ) : (
-                              <p
+                              {/* <p
                                 className={`text-xs font-semibold ${
                                   task.status === "PENDING"
                                     ? "text-yellow-500"
@@ -386,8 +384,8 @@ export default function Projects() {
                                 }`}
                               >
                                 Status: {task.status}
-                              </p>
-                            )}
+                              </p> */}
+             
                           </div>
                           <div className="space-x-3">
                             <Button

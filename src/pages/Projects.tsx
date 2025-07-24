@@ -1,5 +1,3 @@
-// src/pages/Projects.tsx
-
 import { useEffect, useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 import {
@@ -32,6 +30,13 @@ import DeleteDialog from "@/components/DeleteDialog";
 import EditTaskDialog from "@/components/EditTaskDialog";
 import DeleteDialogTask from "@/components/DeleteDialogTask";
 import { useAuth } from "@/context/AuthContext";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@radix-ui/react-select";
 
 type Project = {
   id: string;
@@ -218,6 +223,19 @@ export default function Projects() {
   };
 
   const tasks = tasksData?.data || [];
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return "bg-yellow-600 text-white border-yellow-500";
+      case "IN_PROGRESS":
+        return "bg-blue-600 text-white border-blue-500";
+      case "COMPLETED":
+        return "bg-green-600 text-white border-green-500";
+      default:
+        return "bg-gray-700 text-white border-gray-500";
+    }
+  };
+
   if (tasksLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -241,7 +259,7 @@ export default function Projects() {
         <h2 className="text-3xl font-semibold text-white tracking-wide">
           Projects
         </h2>
-        {(user?.role === "ADMIN" || user?.role === "PROJECT_MANAGER") && (
+       
           <Button
             onClick={() => setOpen(true)}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-105 active:scale-95"
@@ -249,7 +267,6 @@ export default function Projects() {
             <Plus className="w-5 h-5 mr-2" />
             New Project
           </Button>
-        )}
       </div>
 
       {loading ? (
@@ -269,9 +286,7 @@ export default function Projects() {
                   <p className="text-sm text-gray-200">{project.description}</p>
                 </div>
                 <div className="space-x-3">
-                  {(user?.role === "ADMIN" ||
-                    user?.role === "PROJECT_MANAGER") && (
-                    <>
+                
                       <Button
                         variant="ghost"
                         onClick={() => handleEdit(project)}
@@ -286,8 +301,7 @@ export default function Projects() {
                       >
                         <Trash className="w-5 h-5" />
                       </Button>
-                    </>
-                  )}
+                
                   <Button
                     variant="ghost"
                     onClick={() => handleToggleProject(project.id)}
@@ -333,19 +347,47 @@ export default function Projects() {
                             <p className="text-sm text-gray-300">
                               {task.description}
                             </p>
-                            <p
-                              className={`text-xs font-semibold ${
-                                task.status === "PENDING"
-                                  ? "text-yellow-500"
-                                  : task.status === "IN_PROGRESS"
-                                  ? "text-blue-500"
-                                  : task.status === "COMPLETED"
-                                  ? "text-green-500"
-                                  : "text-gray-500"
-                              }`}
-                            >
-                              Status: {task.status}
-                            </p>
+                            {user?.role === "ADMIN" ||
+                            user?.role === "PROJECT_MANAGER" ? (
+                              <div className="flex items-center gap-2 mt-2">
+                                <label className="text-sm font-medium text-white">
+                                  Status:
+                                </label>
+                                <select
+                                  className={`p-1 rounded-md text-sm border focus:ring-2 focus:ring-blue-500 ${getStatusColor(
+                                    task.status
+                                  )}`}
+                                  value={task.status}
+                                  onChange={(e) => {
+                                    const newStatus = e.target.value;
+                                    updateTask({
+                                      id: task.id,
+                                      taskData: { status: newStatus },
+                                    });
+                                  }}
+                                >
+                                  <option value="PENDING">PENDING</option>
+                                  <option value="IN_PROGRESS">
+                                    IN_PROGRESS
+                                  </option>
+                                  <option value="COMPLETED">COMPLETED</option>
+                                </select>
+                              </div>
+                            ) : (
+                              <p
+                                className={`text-xs font-semibold ${
+                                  task.status === "PENDING"
+                                    ? "text-yellow-500"
+                                    : task.status === "IN_PROGRESS"
+                                    ? "text-blue-500"
+                                    : task.status === "COMPLETED"
+                                    ? "text-green-500"
+                                    : "text-gray-500"
+                                }`}
+                              >
+                                Status: {task.status}
+                              </p>
+                            )}
                           </div>
                           <div className="space-x-3">
                             <Button

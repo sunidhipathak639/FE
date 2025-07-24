@@ -68,3 +68,25 @@ export const useDeleteTask = () => {
     }
   })
 }
+export const useUpdateTaskStatus = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      status
+    }: {
+      id: string
+      status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED'
+    }) => {
+      const response = await api.patch(`/tasks/${id}/status`, { status })
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] })
+    },
+    onError: (error) => {
+      console.error('Error updating task status:', error)
+    }
+  })
+}

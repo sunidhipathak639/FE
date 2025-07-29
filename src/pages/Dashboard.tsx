@@ -1,43 +1,41 @@
 import { useEffect, useState } from 'react';
-import DashboardLayout from '../layouts/DashboardLayout'
-import { getUserFromToken } from '../utils/token'
-import socket from '@/services/NotificationService';
+import DashboardLayout from '../layouts/DashboardLayout';
+import { getUserFromToken } from '../utils/token';
+import socket from '@/services/NotificationService'; // Ensure socket is properly configured
+import { fetchNotifications } from '@/services/notifications';
 
 export default function Dashboard() {
-  const user = getUserFromToken()
+  const user = getUserFromToken();
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true); // For loading state
 
+  // Fetch notifications on component mount
   useEffect(() => {
-    // Fetch existing notifications on component mount
-const fetchNotifications = async () => {
-  const response = await fetch('/api/notifications', {
-    method: 'GET',
-    headers: {
-      'Cache-Control': 'no-cache', // Prevent caching
-    },
-  });
-  
-  if (response.ok) {
-    const data = await response.json();
-    setNotifications(data);
-  } else {
-    console.error('Failed to fetch notifications');
-  }
-};
+    const loadNotifications = async () => {
+      setLoading(true);
+      try {
+        const data = await fetchNotifications(); // Use axios to fetch notifications
+        setNotifications(data);
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    loadNotifications();
 
-    fetchNotifications();
-
-    // Listen for new notifications
+    // Listen for new notifications from Socket.io
     socket.on('new_notification', (newNotification) => {
       setNotifications((prev) => [...prev, newNotification]);
     });
 
-    // Cleanup on unmount
+    // Cleanup the event listener on unmount
     return () => {
       socket.off('new_notification');
     };
   }, []);
+
   return (
     <DashboardLayout>
       <div className="space-y-4">
@@ -50,18 +48,25 @@ const fetchNotifications = async () => {
         ) : (
           <p className="text-red-500">User information not found. Please log in again.</p>
         )}
-            <div>
-      <h1>Notifications</h1>
-      <ul>
-        {notifications.map((notification) => (
-          <li key={notification.id}>
-            {notification.content}
-            {/* You can add additional logic for marking as read, etc. */}
-          </li>
-        ))}
-      </ul>
-    </div>
+
+        <div>
+          <h1>Notifications</h1>
+          {loading ? (
+            <p>Loading notifications...</p>
+          ) : notifications.length === 0 ? (
+            <p>No notifications available</p>
+          ) : (
+            <ul>
+              {notifications.map((notification) => (
+                <li key={notification.id} className="bg-gray-700 p-3 rounded-md mb-2">
+                  {notification.content}
+                  {/* You can add logic here for marking as read, etc. */}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </DashboardLayout>
-  )
+  );
 }

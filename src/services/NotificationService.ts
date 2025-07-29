@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5173');
+const socket = io('http://localhost:3000');
 
 // Listen for new notifications
 socket.on('new_notification', (notification: any) => {

@@ -4,7 +4,7 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
 import Users from './pages/Users'
-import Tasks from './pages/Tasks' // 👈 added Tasks page
+import Tasks from './pages/Tasks' 
 import ProtectedRoute from './routes/ProtectedRoute'
 
 function App() {

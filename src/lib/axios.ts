@@ -4,7 +4,7 @@ import axios from 'axios'
 import { getToken } from '@/utils/token' // ✅ this uses the alias @ = src
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5173/api'
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 })
 
 // Attach token automatically to every request

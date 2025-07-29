@@ -13,7 +13,46 @@ export const useTasks = () => {
       console.error('Error fetching tasks:', error)
     }
   })
-}
+};
+export const useAssignedTasks = () => {
+  return useQuery({
+    queryKey: ['assignedTasks'],
+    queryFn: async () => {
+      const response = await api.get('/tasks/assigned');
+      return response.data; // { total, page, limit, data: [...] }
+    },
+    onError: (error) => {
+      console.error('Error fetching assigned tasks:', error);
+    }
+  });
+};
+
+// ✅ Assign task to a user
+export const useAssignTask = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      taskId,
+      assignedToId,
+    }: {
+      taskId: string;
+      assignedToId: string;
+    }) => {
+      const response = await api.put(`/tasks/${taskId}/assign`, {
+        assignedToId,
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    },
+    onError: (error) => {
+      console.error('Error assigning task:', error);
+    },
+  });
+};
+
 
 // ✅ Create a new task
 export const useCreateTask = () => {

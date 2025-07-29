@@ -23,6 +23,8 @@ import {
   useCreateTask,
   useDeleteTask,
   useUpdateTask,
+  useAssignTask,
+  useAssignedTasks,
 } from "../services/task.service";
 import { Edit, Loader2, MessageCircle, Plus, Trash } from "lucide-react";
 import CreateTaskDialog from "@/components/CreateTaskDialog";
@@ -30,13 +32,7 @@ import DeleteDialog from "@/components/DeleteDialog";
 import EditTaskDialog from "@/components/EditTaskDialog";
 import DeleteDialogTask from "@/components/DeleteDialogTask";
 import { useAuth } from "@/context/AuthContext";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@radix-ui/react-select";
+import { getAllUsers } from "@/services/user.service";
 
 type Project = {
   id: string;
@@ -54,7 +50,12 @@ type Task = {
   createdAt: string;
   updatedAt: string;
 };
-
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+};
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(false);
@@ -65,6 +66,9 @@ export default function Projects() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null
   );
+    const [users, setUsers] = useState<User[]>([]);
+    const [taskUsers, setTaskUsers] = useState<User[]>([]);
+
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -78,9 +82,40 @@ export default function Projects() {
   const [commentsByTask, setCommentsByTask] = useState<Record<string, any[]>>(
     {}
   );
+  const { mutate: assignTask } = useAssignTask();
+
   const [newComments, setNewComments] = useState<{ [taskId: string]: string }>(
     {}
   );
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching users', error);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+    const fetchTaskUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await useAssignedTasks();
+      setTaskUsers(data);
+    } catch (error) {
+      console.error('Error fetching users', error);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchTaskUsers();
+  }, []);
+          console.log("Filtered Users", taskUsers);
 
   const {
     data: tasksData,
@@ -372,6 +407,25 @@ export default function Projects() {
                                   <option value="COMPLETED">COMPLETED</option>
                                 </select>
                               </div>
+                              <div className="mt-4 flex items-center gap-2">
+  <label className="text-sm font-medium text-white">Assign To:</label>
+  <select
+    value={task.assignedToId || ""}
+    onChange={(e) => {
+      const newUserId = e.target.value;
+      assignTask({ taskId: task.id, assignedToId: newUserId });
+    }}
+    className="bg-gray-700 text-white p-2 rounded-md focus:ring-2 focus:ring-blue-500"
+  >
+    <option value="">Unassigned</option>
+    {users?.map((user: any) => (
+      <option key={user.id} value={user.id}>
+        {user.name}
+      </option>
+    ))}
+  </select>
+</div>
+
                               {/* <p
                                 className={`text-xs font-semibold ${
                                   task.status === "PENDING"

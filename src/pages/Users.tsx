@@ -1,4 +1,4 @@
-import  { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import { getAllUsers } from '@/services/user.service';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ export default function Users() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
-const [editUser, setEditUser] = useState<User | null>(null);
+  const [editUser, setEditUser] = useState<User | null>(null);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -33,19 +33,19 @@ const [editUser, setEditUser] = useState<User | null>(null);
     setLoading(false);
   };
 
-const deleteUser = async (id: string) => {
-  try {
-    setDeletingUserId(id);
-    await api.delete(`/users/${id}`);
-    setUsers(prev => prev.filter(user => user.id !== id));
-    toast.success('User deleted successfully');
-  } catch (error) {
-    console.error('Delete failed', error);
-    toast.error('Failed to delete user');
-  } finally {
-    setDeletingUserId(null);
-  }
-};
+  const deleteUser = async (id: string) => {
+    try {
+      setDeletingUserId(id);
+      await api.delete(`/users/${id}`);
+      setUsers(prev => prev.filter(user => user.id !== id));
+      toast.success('User deleted successfully');
+    } catch (error) {
+      console.error('Delete failed', error);
+      toast.error('Failed to delete user');
+    } finally {
+      setDeletingUserId(null);
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -89,35 +89,35 @@ const deleteUser = async (id: string) => {
                 <div>{user.email}</div>
                 <div>{user.role}</div>
                 <div className="flex gap-2">
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => setEditUser(user)}
-        >
-          <Pencil className="w-4 h-4 cursor-pointer" />
-        </Button>
-        <Button
-          size="sm"
-          variant="destructive"
-          onClick={() => deleteUser(user.id)}
-          disabled={deletingUserId === user.id}
-        >
-          <Trash2 className="w-4 h-4 cursor-pointer" />
-        </Button>
-      </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setEditUser(user)}
+                  >
+                    <Pencil className="w-4 h-4 cursor-pointer" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => deleteUser(user.id)}
+                    disabled={deletingUserId === user.id}
+                  >
+                    <Trash2 className="w-4 h-4 cursor-pointer" />
+                  </Button>
+                </div>
               </motion.div>
             ))}
           </AnimatePresence>
         </div>
       )}
       {editUser && (
-  <EditUserDialog
-    open={!!editUser}
-    onClose={() => setEditUser(null)}
-    user={editUser}
-    onUpdated={fetchUsers}
-  />
-)}
+        <EditUserDialog
+          open={!!editUser}
+          onClose={() => setEditUser(null)}
+          user={editUser}
+          onUpdated={fetchUsers}
+        />
+      )}
     </DashboardLayout>
   );
 }

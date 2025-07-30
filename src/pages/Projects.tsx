@@ -6,7 +6,7 @@ import {
   deleteProject,
   updateProject,
 } from "@/services/project.service";
-import { createComment, getCommentsByTask } from "@/services/comment.service";
+import { createComment, deleteComment, getCommentsByTask } from "@/services/comment.service";
 import {
   Dialog,
   DialogTrigger,
@@ -66,8 +66,8 @@ export default function Projects() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(
     null
   );
-    const [users, setUsers] = useState<User[]>([]);
-    const [taskUsers, setTaskUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [taskUsers, setTaskUsers] = useState<User[]>([]);
 
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
@@ -82,6 +82,9 @@ export default function Projects() {
   const [commentsByTask, setCommentsByTask] = useState<Record<string, any[]>>(
     {}
   );
+
+
+
   const { mutate: assignTask } = useAssignTask();
 
   const [newComments, setNewComments] = useState<{ [taskId: string]: string }>(
@@ -93,7 +96,7 @@ export default function Projects() {
       const data = await getAllUsers();
       setUsers(data);
     } catch (error) {
-      console.error('Error fetching users', error);
+      console.error("Error fetching users", error);
     }
     setLoading(false);
   };
@@ -101,13 +104,13 @@ export default function Projects() {
   useEffect(() => {
     fetchUsers();
   }, []);
-    const fetchTaskUsers = async () => {
+  const fetchTaskUsers = async () => {
     setLoading(true);
     try {
       const data = await useAssignedTasks();
       setTaskUsers(data);
     } catch (error) {
-      console.error('Error fetching users', error);
+      console.error("Error fetching users", error);
     }
     setLoading(false);
   };
@@ -115,7 +118,7 @@ export default function Projects() {
   useEffect(() => {
     fetchTaskUsers();
   }, []);
-          console.log("Filtered Users", taskUsers);
+  console.log("Filtered Users", taskUsers);
 
   const {
     data: tasksData,
@@ -257,6 +260,7 @@ export default function Projects() {
     setTaskDescription("");
   };
 
+
   const tasks = tasksData?.data || [];
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -270,6 +274,25 @@ export default function Projects() {
         return "bg-gray-700 text-white border-gray-500";
     }
   };
+
+const handleDeleteComment = async (id: string, taskId: string) => {
+  try {
+    await deleteComment(id); // Deleting the comment via API
+    toast.success("Comment deleted successfully");
+
+    // Refetch comments after deletion
+    const updatedComments = await getCommentsByTask(taskId);
+    setCommentsByTask((prevState) => ({
+      ...prevState,
+      [taskId]: updatedComments, // Update the comments for the specific task
+    }));
+  } catch (error) {
+    console.error("Failed to delete comment:", error);
+    toast.error("Failed to delete comment");
+  }
+};
+
+
 
   if (tasksLoading) {
     return (
@@ -294,14 +317,14 @@ export default function Projects() {
         <h2 className="text-3xl font-semibold text-white tracking-wide">
           Projects
         </h2>
-       
-          <Button
-            onClick={() => setOpen(true)}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-105 active:scale-95"
-          >
-            <Plus className="w-5 h-5 mr-2" />
-            New Project
-          </Button>
+
+        <Button
+          onClick={() => setOpen(true)}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 ease-in-out transform hover:scale-105 active:scale-95"
+        >
+          <Plus className="w-5 h-5 mr-2" />
+          New Project
+        </Button>
       </div>
 
       {loading ? (
@@ -321,22 +344,21 @@ export default function Projects() {
                   <p className="text-sm text-gray-200">{project.description}</p>
                 </div>
                 <div className="space-x-3">
-                
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleEdit(project)}
-                        className="text-blue-500 hover:bg-blue-700 p-2 rounded-full transition duration-300"
-                      >
-                        <Edit className="w-5 h-5" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={() => handleDeleteClick(project.id)}
-                        className="text-red-500 hover:bg-red-700 p-2 rounded-full transition duration-300"
-                      >
-                        <Trash className="w-5 h-5" />
-                      </Button>
-                
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleEdit(project)}
+                    className="text-blue-500 hover:bg-blue-700 p-2 rounded-full transition duration-300"
+                  >
+                    <Edit className="w-5 h-5" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleDeleteClick(project.id)}
+                    className="text-red-500 hover:bg-red-700 p-2 rounded-full transition duration-300"
+                  >
+                    <Trash className="w-5 h-5" />
+                  </Button>
+
                   <Button
                     variant="ghost"
                     onClick={() => handleToggleProject(project.id)}
@@ -382,51 +404,54 @@ export default function Projects() {
                             <p className="text-sm text-gray-300">
                               {task.description}
                             </p>
-               
-                              <div className="flex items-center gap-2 mt-2">
-                                <label className="text-sm font-medium text-white">
-                                  Status:
-                                </label>
-                                <select
-                                  className={`p-1 rounded-md text-sm border focus:ring-2 focus:ring-blue-500 ${getStatusColor(
-                                    task.status
-                                  )}`}
-                                  value={task.status}
-                                  onChange={(e) => {
-                                    const newStatus = e.target.value;
-                                    updateTask({
-                                      id: task.id,
-                                      taskData: { status: newStatus },
-                                    });
-                                  }}
-                                >
-                                  <option value="PENDING">PENDING</option>
-                                  <option value="IN_PROGRESS">
-                                    IN_PROGRESS
-                                  </option>
-                                  <option value="COMPLETED">COMPLETED</option>
-                                </select>
-                              </div>
-                              <div className="mt-4 flex items-center gap-2">
-  <label className="text-sm font-medium text-white">Assign To:</label>
-  <select
-    value={task.assignedToId || ""}
-    onChange={(e) => {
-      const newUserId = e.target.value;
-      assignTask({ taskId: task.id, assignedToId: newUserId });
-    }}
-    className="bg-gray-700 text-white p-2 rounded-md focus:ring-2 focus:ring-blue-500"
-  >
-    <option value="">Unassigned</option>
-    {users?.map((user: any) => (
-      <option key={user.id} value={user.id}>
-        {user.name}
-      </option>
-    ))}
-  </select>
-</div>
 
-                              {/* <p
+                            <div className="flex items-center gap-2 mt-2">
+                              <label className="text-sm font-medium text-white">
+                                Status:
+                              </label>
+                              <select
+                                className={`p-1 rounded-md text-sm border focus:ring-2 focus:ring-blue-500 ${getStatusColor(
+                                  task.status
+                                )}`}
+                                value={task.status}
+                                onChange={(e) => {
+                                  const newStatus = e.target.value;
+                                  updateTask({
+                                    id: task.id,
+                                    taskData: { status: newStatus },
+                                  });
+                                }}
+                              >
+                                <option value="PENDING">PENDING</option>
+                                <option value="IN_PROGRESS">IN_PROGRESS</option>
+                                <option value="COMPLETED">COMPLETED</option>
+                              </select>
+                            </div>
+                            <div className="mt-4 flex items-center gap-2">
+                              <label className="text-sm font-medium text-white">
+                                Assign To:
+                              </label>
+                              <select
+                                value={task.assignedToId || ""}
+                                onChange={(e) => {
+                                  const newUserId = e.target.value;
+                                  assignTask({
+                                    taskId: task.id,
+                                    assignedToId: newUserId,
+                                  });
+                                }}
+                                className="bg-gray-700 text-white p-2 rounded-md focus:ring-2 focus:ring-blue-500"
+                              >
+                                <option value="">Unassigned</option>
+                                {users?.map((user: any) => (
+                                  <option key={user.id} value={user.id}>
+                                    {user.name}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
+
+                            {/* <p
                                 className={`text-xs font-semibold ${
                                   task.status === "PENDING"
                                     ? "text-yellow-500"
@@ -439,7 +464,6 @@ export default function Projects() {
                               >
                                 Status: {task.status}
                               </p> */}
-             
                           </div>
                           <div className="space-x-3">
                             <Button
@@ -515,18 +539,28 @@ export default function Projects() {
                           </Button>
                         </div>
 
-                        {/* Display comments */}
-                        {commentsByTask[task.id]?.map((comment: any) => (
-                          <div
-                            key={comment.id}
-                            className="pl-6 mt-2 text-sm text-gray-300 border-l-2 border-blue-500"
-                          >
-                            <p>
-                              <strong>{comment.author?.name || "User"}:</strong>{" "}
-                              {comment.content}
-                            </p>
-                          </div>
-                        ))}
+{commentsByTask[task.id]?.map((comment) => (
+  <div
+    key={comment.id}
+    className="pl-6 mt-2 text-sm text-gray-300 border-l-2 border-blue-500"
+  >
+    <p>
+      <strong>{comment.author?.name || "User"}:</strong> {comment.content}
+    </p>
+
+    {/* Edit and Delete buttons */}
+    <div className="flex gap-2 mt-2">
+      <button
+        onClick={() => handleDeleteComment(comment.id, task.id)} // Delete the comment
+        className="text-red-500 hover:text-red-700"
+      >
+        Delete
+      </button>
+    </div>
+  </div>
+))}
+
+
                       </div>
                     ))}
                 </div>

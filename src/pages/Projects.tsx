@@ -6,7 +6,11 @@ import {
   deleteProject,
   updateProject,
 } from "@/services/project.service";
-import { createComment, deleteComment, getCommentsByTask } from "@/services/comment.service";
+import {
+  createComment,
+  deleteComment,
+  getCommentsByTask,
+} from "@/services/comment.service";
 import {
   Dialog,
   DialogTrigger,
@@ -71,7 +75,7 @@ export default function Projects() {
 
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTask, setEditingTask] = useState<any>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTaskDialogOpen, setDeleteTaskDialogOpen] = useState(false);
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
@@ -82,8 +86,6 @@ export default function Projects() {
   const [commentsByTask, setCommentsByTask] = useState<Record<string, any[]>>(
     {}
   );
-
-
 
   const { mutate: assignTask } = useAssignTask();
 
@@ -161,119 +163,106 @@ export default function Projects() {
     fetchProjects();
   }, []);
 
-  const handleSubmit = async () => {
-    try {
-      if (editingProject) {
-        await updateProject(editingProject.id, { name, description });
-        toast.success("Project updated successfully");
-      } else {
-        await createProject({ name, description });
-        toast.success("Project created successfully");
-      }
-
-      setOpen(false);
-      setEditingProject(null);
-      setName("");
-      setDescription("");
-      fetchProjects(); // refetch updated list
-    } catch {
-      toast.error("Error saving project");
+ const handleSubmit = async () => {
+  try {
+    if (editingProject) {
+      await updateProject(editingProject.id, { name, description });
+      toast.success("Project updated successfully");
+    } else {
+      await createProject({ name, description });
+      toast.success("Project created successfully");
     }
-  };
 
-  const handleEdit = (project: Project) => {
-    setEditingProject(project);
-    setName(project.name);
-    setDescription(project.description || "");
-    setOpen(true);
-  };
+    setOpen(false);
+    setEditingProject(null);
+    setName("");
+    setDescription("");
+    fetchProjects(); // refetch updated list
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || 'Error saving project';
+    toast.error(errorMessage); // Show the BE error message
+  }
+};
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedItemId(id);
-    setDeleteDialogOpen(true);
-  };
-  const handleConfirmDelete = async (id: string) => {
-    try {
-      await deleteProject(id);
-      toast.success("Project deleted successfully");
-      fetchProjects(); // refresh project list
-    } catch (error) {
-      toast.error("Failed to delete project");
-    } finally {
-      setDeleteDialogOpen(false);
-      setSelectedItemId(null);
-    }
-  };
+const handleEdit = (project: Project) => {
+  setEditingProject(project);
+  setName(project.name);
+  setDescription(project.description || "");
+  setOpen(true);
+};
 
-  const handleTaskSubmit = async () => {
-    if (!selectedProjectId || !taskTitle) return;
+const handleDeleteClick = (id: any) => {
+  setSelectedItemId(id);
+  setDeleteDialogOpen(true);
+};
 
-    try {
-      await createTask({
-        title: taskTitle,
-        description: taskDescription,
-        status: "PENDING",
-        projectId: selectedProjectId,
-        assignedToId: user?.id || "", // dynamic instead of hardcoded
-      });
-      setCreateTaskDialogOpen(false);
-      toast.success("Task created successfully");
-      resetTaskForm();
-    } catch {
-      toast.error("Failed to create task");
-    }
-  };
-  const handleUpdateTask = async () => {
-    if (!editingTask || !taskTitle.trim()) return;
+const handleConfirmDelete = async (id: string) => {
+  try {
+    await deleteProject(id);
+    toast.success("Project deleted successfully");
+    fetchProjects(); // refresh project list
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || 'Failed to delete project';
+    toast.error(errorMessage); // Show the BE error message
+  } finally {
+    setDeleteDialogOpen(false);
+    setSelectedItemId(null);
+  }
+};
 
-    try {
-      await updateTask({
-        id: editingTask.id,
-        title: taskTitle,
-        description: taskDescription,
-      });
+const handleTaskSubmit = async () => {
+  if (!selectedProjectId || !taskTitle) return;
 
-      toast.success("Task updated successfully");
-      setEditTaskDialogOpen(false);
-      resetTaskForm();
-    } catch (error) {
-      toast.error("Failed to update task");
-    }
-  };
-  const handleDeleteTask = async () => {
-    if (!selectedTaskId) return;
+  try {
+    await createTask({
+      title: taskTitle,
+      description: taskDescription,
+      status: "PENDING",
+      projectId: selectedProjectId,
+      assignedToId: user?.id || "", // dynamic instead of hardcoded
+    });
+    setCreateTaskDialogOpen(false);
+    toast.success("Task created successfully");
+    resetTaskForm();
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || 'Failed to create task';
+    toast.error(errorMessage); // Show the BE error message
+  }
+};
 
-    try {
-      await deleteTask(selectedTaskId);
-      toast.success("Task deleted successfully");
-    } catch (error) {
-      toast.error("Failed to delete task");
-    } finally {
-      setDeleteTaskDialogOpen(false);
-      setSelectedTaskId(null);
-    }
-  };
+const handleUpdateTask = async () => {
+  if (!editingTask || !taskTitle.trim()) return;
 
-  const resetTaskForm = () => {
-    setEditingTask(null);
-    setTaskTitle("");
-    setTaskDescription("");
-  };
+  try {
+    await updateTask({
+      id: editingTask.id,
+      title: taskTitle,
+      description: taskDescription,
+    });
 
+    toast.success("Task updated successfully");
+    setEditTaskDialogOpen(false);
+    resetTaskForm();
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || 'Failed to update task';
+    toast.error(errorMessage); // Show the BE error message
+  }
+};
 
-  const tasks = tasksData?.data || [];
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "PENDING":
-        return "bg-yellow-600 text-white border-yellow-500";
-      case "IN_PROGRESS":
-        return "bg-blue-600 text-white border-blue-500";
-      case "COMPLETED":
-        return "bg-green-600 text-white border-green-500";
-      default:
-        return "bg-gray-700 text-white border-gray-500";
-    }
-  };
+const handleDeleteTask = async () => {
+  if (!selectedTaskId) return;
+
+  try {
+    await deleteTask(selectedTaskId);
+    toast.success("Task deleted successfully");
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || 'Failed to delete task';
+    toast.error(errorMessage); // Show the BE error message
+  } finally {
+    setDeleteTaskDialogOpen(false);
+    setSelectedTaskId(null);
+  }
+};
 
 const handleDeleteComment = async (id: string, taskId: string) => {
   try {
@@ -286,13 +275,31 @@ const handleDeleteComment = async (id: string, taskId: string) => {
       ...prevState,
       [taskId]: updatedComments, // Update the comments for the specific task
     }));
-  } catch (error) {
-    console.error("Failed to delete comment:", error);
-    toast.error("Failed to delete comment");
+  } catch (error: any) {
+    const errorMessage = error?.response?.data?.message || 'Failed to delete comment';
+    toast.error(errorMessage); // Show the BE error message
   }
 };
 
+  const resetTaskForm = () => {
+    setEditingTask(null);
+    setTaskTitle("");
+    setTaskDescription("");
+  };
 
+  const tasks: any = tasksData?.data || [];
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return "bg-yellow-600 text-white border-yellow-500";
+      case "IN_PROGRESS":
+        return "bg-blue-600 text-white border-blue-500";
+      case "COMPLETED":
+        return "bg-green-600 text-white border-green-500";
+      default:
+        return "bg-gray-700 text-white border-gray-500";
+    }
+  };
 
   if (tasksLoading) {
     return (
@@ -539,28 +546,29 @@ const handleDeleteComment = async (id: string, taskId: string) => {
                           </Button>
                         </div>
 
-{commentsByTask[task.id]?.map((comment) => (
-  <div
-    key={comment.id}
-    className="pl-6 mt-2 text-sm text-gray-300 border-l-2 border-blue-500"
-  >
-    <p>
-      <strong>{comment.author?.name || "User"}:</strong> {comment.content}
-    </p>
+                        {commentsByTask[task.id]?.map((comment) => (
+                          <div
+                            key={comment.id}
+                            className="pl-6 mt-2 text-sm text-gray-300 border-l-2 border-blue-500"
+                          >
+                            <p>
+                              <strong>{comment.author?.name || "User"}:</strong>{" "}
+                              {comment.content}
+                            </p>
 
-    {/* Edit and Delete buttons */}
-    <div className="flex gap-2 mt-2">
-      <button
-        onClick={() => handleDeleteComment(comment.id, task.id)} // Delete the comment
-        className="text-red-500 hover:text-red-700"
-      >
-        Delete
-      </button>
-    </div>
-  </div>
-))}
-
-
+                            {/* Edit and Delete buttons */}
+                            <div className="flex gap-2 mt-2">
+                              <button
+                                onClick={() =>
+                                  handleDeleteComment(comment.id, task.id)
+                                } // Delete the comment
+                                className="text-red-500 hover:text-red-700"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     ))}
                 </div>

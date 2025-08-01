@@ -61,7 +61,14 @@ export default function LoginForm() {
 
   const onSubmit = (data: LoginData) => {
     login(data, {
-      onError: () => toast.error("Invalid email or password ❌"),
+      onError: (error: any) => {
+        // Handle error from BE (invalid email or password)
+        if (error?.response?.data?.message) {
+          toast.error(error.response.data.message || "Login failed ❌");
+        } else {
+          toast.error("An error occurred during login ❌");
+        }
+      },
     });
   };
 
@@ -91,7 +98,7 @@ export default function LoginForm() {
             Login Account
           </CardTitle>
           <CardDescription className="text-xs md:text-sm text-zinc-300">
-            Fill the form to register
+            Fill the form to login
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -131,14 +138,14 @@ export default function LoginForm() {
             <Button
               type="submit"
               variant="ghost"
-              className="w-full text-white curor"
+              className="w-full text-white cursor-pointer"
               disabled={isLoading}
             >
               {isLoading ? "Logging in…" : "Login"}
             </Button>
 
             <p className="text-sm text-muted-foreground text-white text-center">
-              Dont have an account?{" "}
+              Don't have an account?{" "}
               <Button
                 type="button"
                 variant="link"

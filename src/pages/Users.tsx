@@ -22,26 +22,30 @@ export default function Users() {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [editUser, setEditUser] = useState<User | null>(null);
 
+  // Fetch users and handle errors
   const fetchUsers = async () => {
     setLoading(true);
     try {
       const data = await getAllUsers();
       setUsers(data);
+      // toast.success('Users fetched successfully ✅');
     } catch (error) {
-      console.error('Error fetching users', error);
+      // console.error('Error fetching users', error);
+      // toast.error('Failed to fetch users ❌');
     }
     setLoading(false);
   };
 
+  // Delete user and handle success/error
   const deleteUser = async (id: string) => {
     try {
       setDeletingUserId(id);
       await api.delete(`/users/${id}`);
-      setUsers(prev => prev.filter(user => user.id !== id));
-      toast.success('User deleted successfully');
+      setUsers((prev) => prev.filter((user) => user.id !== id));
+      toast.success('User deleted successfully ✅');
     } catch (error) {
       console.error('Delete failed', error);
-      toast.error('Failed to delete user');
+      toast.error('Failed to delete user ❌');
     } finally {
       setDeletingUserId(null);
     }
@@ -76,7 +80,7 @@ export default function Users() {
           </div>
 
           <AnimatePresence>
-            {users.map(user => (
+            {users.map((user) => (
               <motion.div
                 key={user.id}
                 initial={{ opacity: 0, y: 10 }}

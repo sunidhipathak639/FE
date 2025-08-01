@@ -4,7 +4,6 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Projects from './pages/Projects'
 import Users from './pages/Users'
-import Tasks from './pages/Tasks' 
 import ProtectedRoute from './routes/ProtectedRoute'
 
 function App() {
@@ -17,7 +16,6 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/users" element={<Users />} />
-        <Route path="/tasks" element={<Tasks />} />
       </Route>
     </Routes>
   )
